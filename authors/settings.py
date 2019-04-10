@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'django_inlinecss',
     'social_django',
     'cloudinary',
+    'django_social_share',
 ]
 
 MIDDLEWARE = [

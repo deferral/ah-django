@@ -1,4 +1,5 @@
 from rest_framework import status
+from django.urls import reverse
 from ...authentication.tests.base_test import BaseTestCase
 from rest_framework_jwt import utils
 from ..serializers import ArticleSerializer
@@ -172,3 +173,60 @@ class ArticleDetails(BaseTestCase):
                                     rating, HTTP_AUTHORIZATION=auth,
                                     format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_sharing_on_twitter(self):
+        """
+        test the sharing of an article on twitter
+         """
+        payload = utils.jwt_payload_handler(self.testuser)
+        token = utils.jwt_encode_handler(payload)
+        auth = 'Bearer {0}'.format(token)
+        response = self.client.get(reverse('articles:share', kwargs={
+            'slug': 'test-slug', 'platform': 'twitter'
+        }),
+            HTTP_AUTHORIZATION=auth,
+            format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_sharing_on_facebook(self):
+        """
+        test the sharing of an article on facebook
+         """
+        payload = utils.jwt_payload_handler(self.testuser)
+        token = utils.jwt_encode_handler(payload)
+        auth = 'Bearer {0}'.format(token)
+        response = self.client.get(reverse('articles:share', kwargs={
+            'slug': 'test-slug', 'platform': 'facebook'
+        }),
+            HTTP_AUTHORIZATION=auth,
+            format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_sharing_on_reddit(self):
+        """
+        test the sharing of an article on reddit
+         """
+        payload = utils.jwt_payload_handler(self.testuser)
+        token = utils.jwt_encode_handler(payload)
+        auth = 'Bearer {0}'.format(token)
+        response = self.client.get(reverse('articles:share', kwargs={
+            'slug': 'test-slug', 'platform': 'reddit'
+        }),
+            HTTP_AUTHORIZATION=auth,
+            format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_sharing_on_linkedin(self):
+        """
+        test the sharing of an article on linkedin
+         """
+
+        payload = utils.jwt_payload_handler(self.testuser)
+        token = utils.jwt_encode_handler(payload)
+        auth = 'Bearer {0}'.format(token)
+        response = self.client.get(reverse('articles:share', kwargs={
+            'slug': 'test-slug', 'platform': 'linkedin'
+        }),
+            HTTP_AUTHORIZATION=auth,
+            format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
