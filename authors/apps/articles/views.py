@@ -1,11 +1,12 @@
 from rest_framework import generics, status, mixins, exceptions
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (
+    IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny)
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django_social_share.templatetags import social_share
 from django.urls import reverse
 from .models import Article, ArticleRating
+from .exceptions import NoResultsMatch
 from .serializers import ArticleSerializer, RateArticleSerializer
 from ..core.permissions import IsOwnerOrReadOnly
 from django.template.defaultfilters import slugify
@@ -125,7 +126,7 @@ class RateArticle(generics.CreateAPIView):
         return Response({"detail": "rating posted", "avg": avg['rating__avg']},
                         status=status.HTTP_201_CREATED)
 
-
+      
 class ShareArticlesApiView(APIView):
     """
     Implements the functionality for sharing
@@ -171,3 +172,34 @@ class ShareArticlesApiView(APIView):
             "resource_title": article.title,
             "provider": platform
         }}, status.HTTP_200_OK)
+
+      
+class SearchArticlesList(generics.ListAPIView):
+    """
+    This class filters articles search list
+    """
+
+    permission_classes = (AllowAny,)
+    serializer_class = ArticleSerializer
+
+    def get_queryset(self):
+        # queryset = self.filter_queryset(self.get_queryset())
+
+        queryset = Article.objects.all()
+        if 'title' in self.request.query_params:
+            queryset = queryset.filter(
+                title__icontains=self.request.query_params['title'])
+        elif 'author' in self.request.query_params:
+            queryset = queryset.filter(
+                author__username__icontains=self.request.
+                query_params['author'])
+        elif 'tag' in self.request.query_params:
+            queryset = queryset.filter(
+                tagList__icontains=self.request.query_params['tag'])
+        else:
+            queryset = []
+        if len(queryset) <= 0:
+            raise NoResultsMatch
+
+        return queryset
+

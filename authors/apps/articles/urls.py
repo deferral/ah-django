@@ -2,13 +2,15 @@ from django.conf.urls import url
 
 from .views import (
     ArticleList, ArticleDetails, NewArticle, RateArticle,
-    ShareArticlesApiView
+    ShareArticlesApiView, SearchArticlesList
 )
 
 
 app_name = 'articles'
 
 urlpatterns = [
+    url(r'^articles/search',
+        SearchArticlesList.as_view(), name='article_title'),
     url(r'^articles/$', NewArticle.as_view(), name='new_article'),
     url(r'^articles/feed/$', ArticleList.as_view(), name='articles_feed'),
     url(r'^articles/(?P<slug>.+)/share/(?P<platform>.+)/$',
