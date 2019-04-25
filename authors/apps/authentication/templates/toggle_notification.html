@@ -1,0 +1,9 @@
+{% extends 'emailing_template.html' %}
+{% block body %}
+    <div id="email-verification">
+        <p id="greeting">Email Notifications</p>
+            <div class="failed-button">
+                <p>Your notifications have been turned {{ notification }}</p>
+            </div>
+    </div>
+{% endblock %}

@@ -31,6 +31,7 @@ class BaseTestCase(APITestCase):
         self.new_article_path = reverse('articles:new_article')
         self.articles_feed = reverse('articles:articles_feed')
         self.profile_url = reverse('profiles:list_profiles')
+        self.togglenot = reverse('notifications:read-notifications')
 
         self.view_reports = reverse('articles:view_reports')
         self.username = 'testguy99'
@@ -109,6 +110,15 @@ class BaseTestCase(APITestCase):
                 'password': 'badA55mammal!'
             }
         }
+
+        self.toggle_on = {
+            "email_notification": True
+        }
+
+        self.toggle_off = {
+            "email_notification": False
+        }
+
         self.google_social_auth = {
             "token_provider": "google-oauth2",
             "access_token": 'access_token'

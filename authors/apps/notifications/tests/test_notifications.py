@@ -81,3 +81,60 @@ class NotificationConsumerTest(BaseTestCase):
         response = await communicator.receive_from()
         self.assertEqual(response, "hello")
         await communicator.disconnect()
+
+    def test_toggle_on_notification(self):
+        """ Test toggle on notification """
+
+        with self.settings(
+                EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+            res = self.register_new_user(data=self.user3)
+        token = res.data['data']['token']
+        auth = 'Bearer {}'.format(token)
+        url = self.registration_path + "/notifications/toggle/purple"
+        response = self.client.patch(
+            url,
+            self.toggle_on,
+            HTTP_AUTHORIZATION=auth
+        )
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+    def test_toggle_off_notification(self):
+        """ Test toggle on notification """
+
+        with self.settings(
+                EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+            res = self.register_new_user(data=self.user3)
+        token = res.data['data']['token']
+        auth = 'Bearer {}'.format(token)
+        url = self.registration_path + "/notifications/toggle/purple"
+        response = self.client.patch(
+            url,
+            self.toggle_off,
+            HTTP_AUTHORIZATION=auth
+        )
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_200_OK
+        )
+
+    def test_toggle_notification_failure(self):
+        """ Test unauthorized notification toggle """
+
+        with self.settings(
+                EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
+            res = self.register_new_user(data=self.user3)
+        token = res.data['data']['token']
+        auth = 'Bearer {}'.format(token)
+        url = self.registration_path + "/notifications/toggle/yellow"
+        response = self.client.patch(
+            url,
+            self.toggle_on,
+            HTTP_AUTHORIZATION=auth
+        )
+        self.assertEqual(
+            response.status_code,
+            status.HTTP_403_FORBIDDEN
+        )

@@ -195,3 +195,28 @@ class SocialAuthSerializer(serializers.Serializer):
     access_token = serializers.CharField(required=True, trim_whitespace=True)
     access_token_secret = serializers.CharField(
         max_length=300, allow_null=True, default=None, trim_whitespace=True)
+
+
+class ToggleNotificationSerializer(serializers.ModelSerializer):
+    """
+    This class allows user to toggle email notifications on
+    and off
+    """
+
+    class Meta:
+        model = User
+        fields = [
+            'email_notification'
+        ]
+
+    def update(self, instance, validated_data):
+        """
+        Updates the email notification field
+        """
+
+        instance.email_notification = validated_data.get(
+            'email_notification',
+            instance.email_notification
+        )
+        instance.save()
+        return instance
