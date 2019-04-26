@@ -2,7 +2,7 @@ from ..core.mail import mail_helper
 from .serializers import (
     LoginSerializer, RegistrationSerializer, UserSerializer,
     ForgotPasswordSerializer, ResetPasswordSerializer,
-    SocialAuthSerializer)
+    SocialAuthSerializer, ToggleNotificationSerializer)
 from .renderers import UserJSONRenderer, AccountActivationRenderer
 from .models import User
 from .backends import JWTokens
@@ -431,3 +431,53 @@ class SocialAuth(CreateAPIView):
             return Response({
                 "error": "failed to authenticate",
             }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class NotifytoggleAPIView(RetrieveUpdateAPIView):
+    """
+    update the notification setting
+    """
+
+    permission_classes = (IsAuthenticated,)
+    renderer_classes = (UserJSONRenderer,)
+    serializer_class = ToggleNotificationSerializer
+
+    def patch(self, request, string):
+        """
+        This method enables the user toggle notifications
+        """
+
+        if request.user.username != string:
+            return Response((
+                {"message": "You don't have permission"}),
+                status=status.HTTP_403_FORBIDDEN
+            )
+        data = request.data
+        serializer = self.serializer_class(
+                        instance=request.user,
+                        data=data,
+                        partial=True
+                    )
+        serializer.is_valid()
+        serializer.save()
+        notification = 'off'
+        if serializer.data['email_notification']:
+            notification = 'on'
+
+        subject = "Email Notifications"
+        email = request.user.email
+        from_email = os.environ.get('EMAIL_HOST_USER')
+        to_email = email
+        subject = subject
+        html = render_to_string('toggle_notification.html', {
+                                'notification': notification})
+        text_content = strip_tags(html)
+        mail = EmailMultiAlternatives(
+            subject, text_content, from_email, [to_email])
+        mail.attach_alternative(html, "text/html")
+        mail.send()
+
+        return Response(
+            serializer.data,
+            status=status.HTTP_200_OK
+        )
