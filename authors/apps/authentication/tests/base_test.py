@@ -126,14 +126,13 @@ class BaseTestCase(APITestCase):
 
         self.facebook_social_auth = {
             "token_provider": "facebook",
-            "access_token": 'EAAGCNgo8jC4BACqTMo' +
-                            '272cv6RQzDgVPzwKAb1ppiL6' +
-                            'UTg37ZBCJKVEqg3Vn9YfBGxD' +
-                            'sGFg4hc3IydIzxQ2cxzN5kn' +
-                            'SQlOeaa6s4iMFL6z3zik1G7' +
-                            'SERGJ40ZB2XAOaFKcRttNGc' +
-                            'pr4BMKnavMKi9F1VDZC46TW' +
-                            'hRZBsTHc30L2nh85VehTHn'
+            "access_token": 'EAAGCNgo8jC4BAF6tYZBO4gVq11U' +
+                            'rn7FPsFoUBiO7ZBXKoSmhSOUn3aQ' +
+                            'WcVU5kpoQO5AWbdm2ooSW6UCYU' +
+                            'ps5SjUs5JZCkpQyHkqQ4UEQ1cn8' +
+                            'lbSwmSXDZCAh8DsfQD' +
+                            'TR64OUz8bzZBIdjU4Srfu' +
+                            '7yo7Q65dTwTO86lcNWc44wyt41tqQ6sPhQ'
         }
 
         self.facebook_social_wrong_auth = {
