@@ -37,8 +37,12 @@ class RegistrationSerializer(serializers.ModelSerializer):
         # List all of the fields that could possibly be included in a request
         # or response, including fields specified explicitly above.
         # Include all needed fields
+        read_only_fields = (
+            "is_verified",
+        )
+
         fields = (
-            "username", "email", "password", "token"
+            "username", "email", "password", "token", "is_verified"
         )
 
     def create(self, validated_data):
