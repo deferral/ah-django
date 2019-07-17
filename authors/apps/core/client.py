@@ -14,5 +14,6 @@ def get_password_reset_link(request, token):
     client_url refers to the front-end application reset url
     e.g http://ah-django/deferral/reset-password
     """
-    domain = get_current_site(request).domain
-    return 'http://{}/api/account/reset_password/{}'.format(domain, token)
+
+    front_end_domain = os.getenv('FRONTEND_DOMAIN')
+    return 'http://{}/{}'.format(front_end_domain, token)
