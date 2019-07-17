@@ -16,7 +16,7 @@ from rest_framework.response import Response
 
 def user_not_found():
     raise ValidationError(
-        {'error': 'User with that username not found'})
+        {'error': 'User with that user_id not found'})
 
 
 class ListCreateFollow(ListCreateAPIView):
@@ -25,17 +25,17 @@ class ListCreateFollow(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
     renderer_classes = (FollowerJsonRenderer,)
 
-    def post(self, request, username):
+    def post(self, request, user_id):
         """
         A method for following a user
         """
-        user_exists = User.objects.filter(username=username).exists()
+        user_exists = User.objects.filter(id=user_id).exists()
         if not user_exists:
             return Response(
                 {'error': 'user with that name was not found'},
                 status.HTTP_404_NOT_FOUND)
         # we check if the user is already followed
-        followed_user = User.objects.get(username=username)
+        followed_user = User.objects.get(id=user_id)
         already_followed = Follow.is_user_already_followed(
             followed_user_id=followed_user.id,
             user_id=self.request.user.id
@@ -67,8 +67,8 @@ class FollowersView(ListCreateAPIView):
     renderer_classes = (FollowerListJsonRenderer,)
 
     def get(self, request, **kwargs):
-        username = kwargs.get('username')
-        user = User.objects.filter(username=username).first()
+        user_id = kwargs.get('user_id')
+        user = User.objects.filter(id=user_id).first()
         if not user:
             user_not_found()
         queryset = Follow.objects.filter(followed_user=user)
@@ -84,15 +84,15 @@ class DeleteFollower(DestroyAPIView):
     serializer_class = FollowerSerializer
     permission_classes = (IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
-    def delete(self, request, username):
+    def delete(self, request, user_id):
         """
         Removes a user from following list
         """
-        followed_user_exists = User.objects.filter(username=username).exists()
+        followed_user_exists = User.objects.filter(id=user_id).exists()
         if not followed_user_exists:
             return Response({'error': 'user not found'},
                             status.HTTP_404_NOT_FOUND)
-        followed_user = User.objects.get(username=username)
+        followed_user = User.objects.get(id=user_id)
         user_exists = Follow.is_user_already_followed(
             followed_user_id=followed_user.id,
             user_id=request.user.id
@@ -119,11 +119,11 @@ class RetrieveFollowing(ListCreateAPIView):
     permission_classes = (IsAuthenticated,)
 
     def get(self, request, **kwargs):
-        username = kwargs.get('username')
+        user_id = kwargs.get('user_id')
         """
-        Get userlist by using the username value
+        Get userlist by using the user_id value
         """
-        user = User.objects.filter(username=username).first()
+        user = User.objects.filter(id=user_id).first()
         if not user:
             user_not_found()
         following_list = Follow.objects.filter(user=user)

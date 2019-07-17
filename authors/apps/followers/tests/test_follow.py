@@ -1,6 +1,9 @@
 from rest_framework import status
-
+from django.urls import reverse
 from authors.apps.followers.tests.base_test import FollowerBaseTest
+from rest_framework_jwt.compat import get_user_model
+
+User = get_user_model()
 
 
 class FollowerTestCase(FollowerBaseTest):
@@ -12,6 +15,8 @@ class FollowerTestCase(FollowerBaseTest):
         """
         A user should be logged in in order to follow another user
         """
+        self.follow_url = reverse('followers:follow_url', kwargs={
+            "user_id": 1})
         response = self.client.post(self.follow_url, format='json')
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
 
@@ -23,6 +28,11 @@ class FollowerTestCase(FollowerBaseTest):
         with self.settings(
                 EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.register_user(self.user1)
+            self.user_id_list = list(User.objects.values('id'))
+            self.user_id = self.user_id_list[0]['id']
+            self.user1_id = self.user_id_list[1]['id']
+            self.follow_url = reverse('followers:follow_url', kwargs={
+                "user_id": self.user1_id})
             response = self.client.post(self.follow_url, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -33,6 +43,10 @@ class FollowerTestCase(FollowerBaseTest):
         with self.settings(
                 EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.authorize_user(self.user)
+            self.user_id_list = list(User.objects.values('id'))
+            self.user_id = self.user_id_list[0]['id']
+            self.follow_url = reverse('followers:follow_url', kwargs={
+                "user_id": 1})
             response = self.client.post(self.follow_url, format='json')
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
@@ -43,6 +57,10 @@ class FollowerTestCase(FollowerBaseTest):
         with self.settings(
                 EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.authorize_user(self.user)
+            self.user_id_list = list(User.objects.values('id'))
+            self.user_id = self.user_id_list[0]['id']
+            self.follow_self_url = reverse('followers:follow_url', kwargs={
+                "user_id": self.user_id})
             response = self.client.post(self.follow_self_url, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -54,6 +72,11 @@ class FollowerTestCase(FollowerBaseTest):
         with self.settings(
                 EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.register_user(self.user1)
+            self.user_id_list = list(User.objects.values('id'))
+            self.user_id = self.user_id_list[0]['id']
+            self.user1_id = self.user_id_list[1]['id']
+            self.follow_url = reverse('followers:follow_url', kwargs={
+                "user_id": self.user1_id})
             self.client.post(self.follow_url, format='json')
             response2 = self.client.post(self.follow_url, format='json')
         self.assertEqual(response2.content,
@@ -68,7 +91,15 @@ class FollowerTestCase(FollowerBaseTest):
         with self.settings(
                 EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.register_user(self.user1)
+            self.user_id_list = list(User.objects.values('id'))
+            self.user_id = self.user_id_list[0]['id']
+            self.user1_id = self.user_id_list[1]['id']
+            self.follow_url = reverse('followers:follow_url', kwargs={
+                "user_id": self.user1_id})
             self.client.post(self.follow_url, format='json')
+            self.unfollow_url = reverse('followers:delete_url', kwargs={
+                "user_id": self.user1_id
+            })
             response = self.client.delete(self.unfollow_url,
                                           data=self.followed_user)
         self.assertEqual(response.content,
@@ -83,7 +114,11 @@ class FollowerTestCase(FollowerBaseTest):
         with self.settings(
                 EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.register_user(self.user1)
-        self.client.post(self.follow_url, format='json')
+            self.user_id_list = list(User.objects.values('id'))
+            self.user_id = self.user_id_list[0]['id']
+            self.unfollow_url = reverse('followers:delete_url', kwargs={
+                "user_id": self.user_id
+            })
         response = self.client.delete(self.unfollow_url,
                                       data=self.followed_user)
         self.assertEqual(response.data['detail'],
@@ -99,8 +134,13 @@ class FollowerTestCase(FollowerBaseTest):
                 EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.authorize_user(self.user)
             self.register_user(self.user1)
-            self.client.post(self.follow_url, format='json')
-            response = self.client.get(self.following_list_url)
+            self.user_id_list = list(User.objects.values('id'))
+            self.user_id = self.user_id_list[0]['id']
+            self.user1_id = self.user_id_list[1]['id']
+            self.followers_url = reverse('followers:followers_url', kwargs={
+                "user_id": self.user_id
+            })
+            response = self.client.get(self.followers_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_list_of_following_users_without_auth(self):
@@ -112,6 +152,12 @@ class FollowerTestCase(FollowerBaseTest):
         with self.settings(
                 EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.register_user(self.user1)
+            self.user_id_list = list(User.objects.values('id'))
+            self.user_id = self.user_id_list[0]['id']
+            self.user1_id = self.user_id_list[1]['id']
+            self.following_list_url = reverse('followers:following_url', kwargs={
+                "user_id": self.user_id
+            })
             response = self.client.get(self.following_list_url)
         self.assertEqual(response.content,
                          b'{"following": []}')
@@ -124,7 +170,12 @@ class FollowerTestCase(FollowerBaseTest):
         with self.settings(
                 EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
             self.authorize_user(self.user)
-            response = self.client.get(self.followers_url)
+            self.user_id_list = list(User.objects.values('id'))
+            self.user_id = self.user_id_list[0]['id']
+            self.following_list_url = reverse('followers:following_url', kwargs={
+                "user_id": self.user_id
+            })
+            response = self.client.get(self.following_list_url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_get_list_of_followers_without_auth(self):
@@ -134,7 +185,10 @@ class FollowerTestCase(FollowerBaseTest):
         """
         with self.settings(
                 EMAIL_BACKEND='django.core.mail.backends.locmem.EmailBackend'):
-            response = self.client.get(self.followers_url)
+            self.following_list_url = reverse('followers:following_url', kwargs={
+                "user_id": 1
+            })
+            response = self.client.get(self.following_list_url)
         self.assertEqual(response.data['detail'],
                          "Authentication credentials were not provided.")
 

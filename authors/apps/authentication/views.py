@@ -132,6 +132,7 @@ class LoginAPIView(APIView):
             logs the user into the system
         """
         user = request.data.get('user', {})
+        user_id = User.objects.get(username=user["username"])
 
         # Notice here that we do not call `serializer.save()` like we did for
         # the registration endpoint. This is because we don't actually have
@@ -139,8 +140,10 @@ class LoginAPIView(APIView):
         # handles everything we need.
         serializer = self.serializer_class(data=user)
         serializer.is_valid(raise_exception=True)
+        serialized_data = serializer.data
+        serialized_data["user_id"] = user_id.id
 
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serialized_data, status=status.HTTP_200_OK)
 
 
 class VerifyUserAPIView(RetrieveAPIView):

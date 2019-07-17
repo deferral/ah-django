@@ -33,6 +33,7 @@ class DisLikeReaction:
         """
 
         self.reaction = inherited_react
+        self.article_liked = False
 
         try:
             like_status = UserReaction.objects.get(
@@ -54,6 +55,7 @@ class DisLikeReaction:
             instance.user_reaction.create(
                 user_reaction=self.reaction,
                 user=user)
+            self.article_liked = True
             msg = "Reaction Created"
             status_ = status.HTTP_201_CREATED
 
@@ -66,7 +68,8 @@ class DisLikeReaction:
             'dislikes': instance.
             user_reaction.dislikes.count(),
             'participated_users': instance.
-            user_reaction.fetch_popularity_status()
+            user_reaction.fetch_popularity_status(),
+            'article_liked': self.article_liked
         }
         response['data'] = data
 

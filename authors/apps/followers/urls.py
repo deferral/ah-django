@@ -5,12 +5,12 @@ from .views import FollowersView, RetrieveFollowing
 app_name = 'followers'
 
 urlpatterns = [
-    url(r'^profiles/?(?P<username>[a-zA-Z0-9_\.-]{3,255})?/?/follow/?$',
+    url(r'^profiles/?/(?P<user_id>[\d]+)?/?/follow/?$',
         ListCreateFollow.as_view(), name='follow_url'),
-    url(r'^profiles/?(?P<username>[a-zA-Z0-9_\.-]{3,255})?/?/unfollow',
+    url(r'^profiles/?/(?P<user_id>[\d]+)?/?/unfollow',
         DeleteFollower.as_view(), name='delete_url'),
-    url(r'^profiles/?(?P<username>[a-zA-Z0-9_\.-]{3,255})?/?/followers/',
+    url(r'^profiles/?/(?P<user_id>[\d]+)?/?/followers/',
         FollowersView.as_view(), name='followers_url'),
-    url(r'^profiles/?(?P<username>[a-zA-Z0-9_\.-]{3,255})?/?/following/',
+    url(r'^profiles/?/(?P<user_id>[\d]+)?/?/following/',
         RetrieveFollowing.as_view(), name='following_url'),
 ]

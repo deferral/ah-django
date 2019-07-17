@@ -1,8 +1,8 @@
 from django.urls import reverse
-
+from rest_framework_jwt.compat import get_user_model
 from rest_framework.test import APITestCase, APIClient
 
-
+User = get_user_model()
 class FollowerBaseTest(APITestCase):
     """
     A base test containing for followers tests file
@@ -22,7 +22,7 @@ class FollowerBaseTest(APITestCase):
             "user": {
                 "username": "testuser",
                 "email": "test@this.com",
-                "password": "testT23#$"
+                "password": "testT23#!"
             }
         }
 
@@ -45,21 +45,21 @@ class FollowerBaseTest(APITestCase):
         self.client = APIClient()
         self.registration_path = reverse('authentication:activation')
         self.login_path = reverse('authentication:login')
-        self.follow_url = reverse('followers:follow_url', kwargs={
-            "username": self.followed_user['username']}
-        )
-        self.follow_self_url = reverse('followers:follow_url', kwargs={
-            "username": self.follow_self['username']}
-        )
-        self.unfollow_url = reverse('followers:delete_url', kwargs={
-            "username": self.followed_user['username']
-        })
-        self.following_list_url = reverse('followers:following_url', kwargs={
-            "username": self.followed_user['username']
-        })
-        self.followers_url = reverse('followers:followers_url', kwargs={
-            "username": self.follow_user['username']
-        })
+        # self.follow_url = reverse('followers:follow_url', kwargs={
+        #     "user_id": self.user_id})
+
+        # self.follow_self_url = reverse('followers:follow_url', kwargs={
+        #     "user_id": self.user_id})
+
+        # self.unfollow_url = reverse('followers:delete_url', kwargs={
+        #     "user_id": self.user_id
+        # })
+        # self.following_list_url = reverse('followers:following_url', kwargs={
+        #     "user_id": self.user_id
+        # })
+        # self.followers_url = reverse('followers:followers_url', kwargs={
+        #     "user_id": self.user_id
+        # })
 
     def register_user(self, data):
         return self.client.post(
