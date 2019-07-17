@@ -1,5 +1,6 @@
 import cloudinary
 import imghdr
+import validators
 from rest_framework import generics, status, mixins, exceptions
 from rest_framework.permissions import (
     IsAuthenticated, IsAuthenticatedOrReadOnly,
@@ -78,6 +79,8 @@ class NewArticle(APIView):
                     article['image'], 'dvyip3rs',
                     public_id=article['slug'])
                 article['image'] = res['url']
+            elif validators.url(article['image']):
+                article['image'] = article['image']
             else:
                 return Response({"error": "image not found"},
                                 status=status.HTTP_400_BAD_REQUEST)
@@ -100,6 +103,18 @@ class ArticleList(generics.ListAPIView):
 
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
+
+
+class UserArticlesList(generics.ListAPIView):
+    queryset = Article.objects.all()
+    serializer_class = ArticleSerializer
+    lookup_field = "id"
+
+    def list(self, request, id, *args, **kwargs):
+        posts = Article.objects.filter(author=id)
+
+        serializer = self.serializer_class(posts, many=True)
+        return Response(serializer.data)
 
 
 class ArticleDetails(generics.RetrieveAPIView, mixins.UpdateModelMixin,

@@ -178,7 +178,7 @@ REST_FRAMEWORK = {
 
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination'
                                 '.PageNumberPagination',
-    'PAGE_SIZE': 5
+    'PAGE_SIZE': 10
 }
 
 EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
@@ -219,7 +219,7 @@ JWT_AUTH = {
         'JWT_VERIFY': True,
         'JWT_VERIFY_EXPIRATION': True,
         'JWT_LEEWAY': 0,
-        'JWT_EXPIRATION_DELTA': datetime.timedelta(hours=3),
+        'JWT_EXPIRATION_DELTA': datetime.timedelta(days=17),
         'JWT_AUDIENCE': None,
         'JWT_ISSUER': None,
         'JWT_ALLOW_REFRESH': False,

@@ -104,7 +104,8 @@ class LoginSerializer(serializers.Serializer):
         # that we will see later on.
         return {
             'username': user.username,
-            'token': token
+            'token': token,
+            'user_id': user.id,
         }
 
 
